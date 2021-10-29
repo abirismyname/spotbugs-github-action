@@ -1,0 +1,31 @@
+name: 'SpotBugs GitHub Action'
+description: 'Runs SpotBugs Static Analysis Tool for Java - https://spotbugs.github.io/'
+branding:
+  icon: 'check'  
+  color: 'blue'
+inputs:
+  spotbugs-version:
+    description: 'SpotBugs version to use.'
+    default: 'latest'
+    required: false  
+  arguments:
+    description: 'Command arguments to be sent to SpotBugs'
+    required: true
+    default: ''
+  output:
+    description: 'Output file name'
+    required: true
+  target:
+    description: 'Target of what you want to analyze'
+    required: true    
+runs:
+  using: "composite"
+  steps: 
+    - id: spotbot-analysis
+      run: ${{ github.action_path }}/analyze.sh
+      shell: bash
+      env:
+        SPOTBUGS_VERSION: ${{ inputs.spotbugs-version }}
+        OUTPUT: ${{ inputs.output }}
+        ARGUMENTS: ${{ inputs.arguments }}  
+        TARGET: ${{ inputs.target }}

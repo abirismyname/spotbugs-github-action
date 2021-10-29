@@ -1,0 +1,22 @@
+name: Code Analysis (SpotBugs)
+
+on:
+  pull_request:
+  push:
+  workflow_dispatch:
+jobs:
+  spotbugs-analyze:
+    name: Analyze
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Run SpotBugs
+        uses: abirismyname/spotbugs-github-action@main
+        with:
+          arguments: '-sarif'
+          target: './.github/workflows/HelloWorld.jar'
+          output: 'results.sarif'
+          spotbugs-version: 'latest'
+      - name: Show results.sarif
+        run: jq . results.sarif
