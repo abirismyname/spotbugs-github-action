@@ -4,8 +4,8 @@
 # PACKAGES="com.example.demo.-"
 # source path to prepend to the class path
 # BASEPATH="src/main/java"
-# DEPENDENCYPATH="~/.m2"
-
+# DEPENDENCIES_PATH="~/.m2"
+# OUTPUT_TYPE="sarif"
 
 # Check whether to use latest version of PMD
 if [ "$SPOTBUGS_VERSION" == 'latest' ] || [ "$SPOTBUGS_VERSION" == "" ]; then
@@ -34,20 +34,54 @@ fi
 
 CMD="$CMD -quiet -effort:max -low -noClassOk"
 
-if [ "$SARIF" == "true" ]; then
-    CMD="$CMD -sarif:withMessages=./resultspre.sarif"
-fi
+case $OUTPUT_TYPE in
+    "xml")
+        if [ "$OUTPUT" == "" ]; then
+            OUTPUT="results.xml"
+        fi
+        CMD="$CMD -xml:withMessages=./$OUTPUT"
+        ;;
+    "html")
+        if [ "$OUTPUT" == "" ]; then
+            OUTPUT="results.html"
+        fi
+        CMD="$CMD -html:withMessages=./$OUTPUT"
+        ;;
+    "emacs")
+        if [ "$OUTPUT" == "" ]; then
+            OUTPUT="results.emacs"
+        fi
+        CMD="$CMD -emacs:withMessages=./$OUTPUT"
+        ;;
+    "xdocs")
+        if [ "$OUTPUT" == "" ]; then
+            OUTPUT="results.xdocs"
+        fi
+        CMD="$CMD -xdoc:withMessages=./$OUTPUT"
+        ;;
+    *)
+        OUTPUT_TYPE="sarif"
+        if [ "$OUTPUT" == "" ]; then
+            OUTPUT="results.sarif"
+        fi
+        CMD="$CMD -sarif:withMessages=./resultspre.sarif"
+        ;;
+esac
 
-if [ "$DEPENDENCYPATH" != "" ]; then
-    find "$DEPENDENCYPATH" -name "*.jar" -type f > /tmp/jardependencies.txt
+if [ "$DEPENDENCIES_PATH" != "" ]; then
+    find "$DEPENDENCIES_PATH" -name "*.jar" -type f > /tmp/jardependencies.txt
     CMD="$CMD -auxclasspathFromFile /tmp/jardependencies.txt"
 fi
 
-if [ "$BASEPATH" != "" ]; then
-    if [[ "$BASEPATH" != */ ]]; then
-        BASEPATH="$BASEPATH/"
+if [ "$BASE_PATH" != "" ]; then
+    if [[ "$BASE_PATH" != */ ]]; then
+        BASEPATH="$BASE_PATH/"
     fi
-    CMD="$CMD -sourcepath ${BASEPATH}"
+    CMD="$CMD -sourcepath ${BASE_PATH}"
+fi
+
+if [ "$ARGUMENTS" != ""]; then
+    CMD="$CMD ${ARGUMENTS}"
 fi
 
 if [ "$TARGET" != "" ]; then
@@ -60,8 +94,8 @@ echo "Running SpotBugs with command: $CMD"
 
 eval ${CMD}
 
-if [ "$SARIF" == "true" ] && [ "$BASEPATH" != "" ]; then
+if [ "$OUTPUT_TYPE" == "sarif" ] && [ "$BASE_PATH" != "" ]; then
     # prepend the pyhsical path
-    jq -c "(.runs[].results[].locations[].physicalLocation.artifactLocation.uri) |=\"$BASEPATH\"+." resultspre.sarif > results.sarif
+    jq -c "(.runs[].results[].locations[].physicalLocation.artifactLocation.uri) |=\"$BASEPATH\"+." resultspre.sarif > "$OUTPUT"
 fi
 
