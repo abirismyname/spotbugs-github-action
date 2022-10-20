@@ -8,16 +8,47 @@ inputs:
     description: 'SpotBugs version to use.'
     default: 'latest'
     required: false  
+  packages:
+    description: >
+      Comma separated list of packages to scan. It will fill the 
+      -onlyAnalyze parameter in spotbugs. It can contain the wildcards '*' and
+      '-': com.example.* for single package or com.example.- for all
+      subpackages.
+
+      If not specified, it will scan all packages.
+      See more: https://spotbugs.readthedocs.io/en/stable/running.html#text-ui-options
+    required: false
   arguments:
-    description: 'Command arguments to be sent to SpotBugs'
-    required: true
-    default: ''
+    description: >
+      A string with any additional command arguments to be sent to spotbugs.
+      See more: https://spotbugs.readthedocs.io/en/stable/running.html#text-ui-options
+    required: false
   output:
-    description: 'Output file name'
-    required: true
+    description: >
+      The output filename. If not specified, it will use the default name
+      'results.EXTENSION'
   target:
-    description: 'Target of what you want to analyze'
-    required: true    
+    description: >
+      Target of what you want to analyze. It can be a file or a directory, it
+      is usually the ./target folder where you compiled your project.      
+    required: false
+  outputType:
+    description: >
+      Output type for the report. It can be 'xml', 'html', 'sarif', 'emacs'
+      or 'xdocs'. Default value is 'sarif' as it is the used by GitHub Advanced
+      Security.
+    default: 'sarif'
+    required: true
+  dependenciesPath:
+    description: >
+      Path to the dependencies folder. For Maven it is usually stored in the
+      '~/.m2'  folder.
+    required: false
+  basePath:
+    description: >
+      The basePath is used as a prefix in the sarif file to help GitHub find the
+      right file of the issue. It is tipically something like 'src/main/java'.
+    required: false
 runs:
   using: "composite"
   steps: 
@@ -26,6 +57,10 @@ runs:
       shell: bash
       env:
         SPOTBUGS_VERSION: ${{ inputs.spotbugs-version }}
+        PACKAGES: ${{ inputs.packages }}
         OUTPUT: ${{ inputs.output }}
+        OUTPUT_TYPE: ${{ inputs.outputType }}
         ARGUMENTS: ${{ inputs.arguments }}  
         TARGET: ${{ inputs.target }}
+        DEPENDENCIES_PATH: ${{ inputs.dependenciesPath }}
+        BASE_PATH: ${{ inputs.basePath }}
