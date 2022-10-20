@@ -75,12 +75,12 @@ fi
 
 if [ "$BASE_PATH" != "" ]; then
     if [[ "$BASE_PATH" != */ ]]; then
-        BASEPATH="$BASE_PATH/"
+        BASE_PATH="$BASE_PATH/"
     fi
     CMD="$CMD -sourcepath ${BASE_PATH}"
 fi
 
-if [ "$ARGUMENTS" != ""]; then
+if [ "$ARGUMENTS" != "" ]; then
     CMD="$CMD ${ARGUMENTS}"
 fi
 
@@ -96,6 +96,8 @@ eval ${CMD}
 
 if [ "$OUTPUT_TYPE" == "sarif" ] && [ "$BASE_PATH" != "" ]; then
     # prepend the pyhsical path
-    jq -c "(.runs[].results[].locations[].physicalLocation.artifactLocation.uri) |=\"$BASEPATH\"+." resultspre.sarif > "$OUTPUT"
+    echo "Transform sarif file to include the physical path"
+    jq -c "(.runs[].results[].locations[].physicalLocation.artifactLocation.uri) |=\"$BASE_PATH\"+." resultspre.sarif > "$OUTPUT"
+    cat $OUTPUT
 fi
 
