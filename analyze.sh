@@ -79,8 +79,9 @@ if [ "$BASE_PATH" != "" ]; then
     if [[ "$BASE_PATH" != */ ]]; then
         BASE_PATH="$BASE_PATH/"
     fi
-    # using sourcepath does not work for sarif
-    # CMD="$CMD -sourcepath ${BASE_PATH}"
+    # using sourcepath does not work for GitHub's sarif parser
+    # but keeping there just in case
+    CMD="$CMD -sourcepath ${BASE_PATH}"
 fi
 
 if [ "$ARGUMENTS" != "" ]; then
@@ -100,7 +101,7 @@ eval ${CMD}
 if [ "$OUTPUT_TYPE" == "sarif" ] && [ "$BASE_PATH" != "" ]; then
     # prepend the pyhsical path
     echo "Transform sarif file to include the physical path"
-    jq -c "(.runs[].results[].locations[].physicalLocation.artifactLocation.uri) |=\"$BASE_PATH\"+." resultspre.sarif > "$OUTPUT"
+    cat resultspre.sarif | jq -c "(.runs[].results[].locations[].physicalLocation.artifactLocation.uri) |=\"$BASE_PATH\"+." > "$OUTPUT"
     cat $OUTPUT
 fi
 
