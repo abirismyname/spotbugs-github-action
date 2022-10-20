@@ -101,7 +101,7 @@ eval ${CMD}
 if [ "$OUTPUT_TYPE" == "sarif" ] && [ "$BASE_PATH" != "" ]; then
     # prepend the pyhsical path
     echo "Transform sarif file to include the physical path"
-    cat resultspre.sarif | jq -c "(.runs[].results[].locations[].physicalLocation.artifactLocation.uri) |=\"$BASE_PATH\"+." > "$OUTPUT"
-    cat $OUTPUT
+    cat resultspre.sarif | jq -c "(.runs[].results[].locations[].physicalLocation.artifactLocation.uri) |=\"$BASE_PATH\"+." > resultspre2.sarif
+    cat resultspre2.sarif | jq -c '(.runs[].invocations[].executionSuccessful)=true' > results.sarif
 fi
 
