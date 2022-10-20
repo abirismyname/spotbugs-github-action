@@ -100,5 +100,6 @@ if [ "$OUTPUT_TYPE" == "sarif" ] && [ "$BASE_PATH" != "" ]; then
     # prepend the pyhsical path
     echo "Transform sarif file to include the physical path"
     jq -c "(.runs[].results[].locations[].physicalLocation.artifactLocation.uri) |=\"$BASE_PATH\"+." resultspre.sarif > "$OUTPUT"
+    cat $OUTPUT
 fi
 
