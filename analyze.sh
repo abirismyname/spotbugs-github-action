@@ -69,7 +69,8 @@ case $OUTPUT_TYPE in
 esac
 
 if [ "$DEPENDENCIES_PATH" != "" ]; then
-    find "$DEPENDENCIES_PATH" -name "*.jar" -type f > /tmp/jardependencies.txt
+    echo "Scanning jars: find ${DEPENDENCIES_PATH} -name "*.jar" -type f > /tmp/jardependencies.txt"
+    find ${DEPENDENCIES_PATH} -name "*.jar" -type f > /tmp/jardependencies.txt
     CMD="$CMD -auxclasspathFromFile /tmp/jardependencies.txt"
 fi
 
