@@ -14,7 +14,7 @@ if [ "$SPOTBUGS_VERSION" == 'latest' ] || [ "$SPOTBUGS_VERSION" == "" ]; then
 fi
 
 # Download SpotBugs
-wget -q https://github.com/spotbugs/spotbugs/releases/download/"${SPOTBUGS_VERSION}"/spotbugs-"${SPOTBUGS_VERSION}".zip
+wget -q -N https://github.com/spotbugs/spotbugs/releases/download/"${SPOTBUGS_VERSION}"/spotbugs-"${SPOTBUGS_VERSION}".zip
 unzip -q -o spotbugs-"${SPOTBUGS_VERSION}".zip
 
 # Run SpotBugs
@@ -79,7 +79,8 @@ if [ "$BASE_PATH" != "" ]; then
     if [[ "$BASE_PATH" != */ ]]; then
         BASE_PATH="$BASE_PATH/"
     fi
-    CMD="$CMD -sourcepath ${BASE_PATH}"
+    # using sourcepath does not work for sarif
+    # CMD="$CMD -sourcepath ${BASE_PATH}"
 fi
 
 if [ "$ARGUMENTS" != "" ]; then
