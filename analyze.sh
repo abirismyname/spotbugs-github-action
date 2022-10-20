@@ -14,8 +14,8 @@ if [ "$SPOTBUGS_VERSION" == 'latest' ] || [ "$SPOTBUGS_VERSION" == "" ]; then
 fi
 
 # Download SpotBugs
-wget https://github.com/spotbugs/spotbugs/releases/download/"${SPOTBUGS_VERSION}"/spotbugs-"${SPOTBUGS_VERSION}".zip
-unzip -o spotbugs-"${SPOTBUGS_VERSION}".zip
+wget -q https://github.com/spotbugs/spotbugs/releases/download/"${SPOTBUGS_VERSION}"/spotbugs-"${SPOTBUGS_VERSION}".zip
+unzip -q -o spotbugs-"${SPOTBUGS_VERSION}".zip
 
 # Run SpotBugs
 SPOTBUGS_HOME=spotbugs-"${SPOTBUGS_VERSION}"
@@ -69,8 +69,9 @@ case $OUTPUT_TYPE in
 esac
 
 if [ "$DEPENDENCIES_PATH" != "" ]; then
-    echo "Scanning jars: find ${DEPENDENCIES_PATH} -name "*.jar" -type f > /tmp/jardependencies.txt"
-    find ${DEPENDENCIES_PATH} -name "*.jar" -type f > /tmp/jardependencies.txt
+    DEP_CMD="find ${DEPENDENCIES_PATH} -name \"*.jar\" -type f > /tmp/jardependencies.txt"
+    echo "Scanning jars with: ${DEP_CMD}"
+    eval ${DEP_CMD}
     CMD="$CMD -auxclasspathFromFile /tmp/jardependencies.txt"
 fi
 
@@ -99,6 +100,5 @@ if [ "$OUTPUT_TYPE" == "sarif" ] && [ "$BASE_PATH" != "" ]; then
     # prepend the pyhsical path
     echo "Transform sarif file to include the physical path"
     jq -c "(.runs[].results[].locations[].physicalLocation.artifactLocation.uri) |=\"$BASE_PATH\"+." resultspre.sarif > "$OUTPUT"
-    cat $OUTPUT
 fi
 
